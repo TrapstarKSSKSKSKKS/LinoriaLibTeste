@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.22.8')
+print('Loading Linoria UI v2.22.9')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -1137,6 +1137,8 @@ do
 
 			ModeButtons[Mode] = ModeButton
 		end
+
+		function KeyPicker:RemoveUI(toggle) ContainerLabel.Visible = toggle end
 
 		function KeyPicker:Update()
 			if Info.NoUI then return end
