@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.23.1')
+print('Loading Linoria UI v2.23.3')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -1302,7 +1302,7 @@ do
 
 		Options[Idx] = KeyPicker
 
-		return self
+		return KeyPicker
 	end
 
 	BaseAddons.__index = Funcs
