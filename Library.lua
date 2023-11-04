@@ -3796,7 +3796,7 @@ do --// PreLoad
 		local gThemes = tUI:AddRightGroupbox('Themes')
 		local gMisc = tUI:AddLeftGroupbox('Misc')
 		ThemeManager:ApplyToGroupbox(gThemes)
-		gMisc:AddButton('Unload', function() Library:Unload() end)
+		gMisc:AddButton('Unload', Library:Unload)
 		gMisc:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'Delete', NoUI = true, Text = 'Menu keybind' })
 		Library.ToggleKeybind = Options.MenuKeybind
 
@@ -3810,7 +3810,7 @@ do --// PreLoad
 				Text = 'Show Watermark',
 				Default = false,
 			})
-			:OnChanged(function(t) Library:SetWatermarkVisibility(t) end)
+			:OnChanged(Library:SetWatermarkVisibility)
 
 		gMisc
 			:AddToggle('ShowKeybindsMenu', {
