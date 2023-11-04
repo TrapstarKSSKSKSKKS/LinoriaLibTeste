@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.20.4')
+print('Loading Linoria UI v2.22.5')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -3796,7 +3796,7 @@ do --// PreLoad
 		local gThemes = tUI:AddRightGroupbox('Themes')
 		local gMisc = tUI:AddLeftGroupbox('Misc')
 		ThemeManager:ApplyToGroupbox(gThemes)
-		gMisc:AddButton('Unload', Library:Unload)
+		gMisc:AddButton('Unload', function() Library:Unload() end)
 		gMisc:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'Delete', NoUI = true, Text = 'Menu keybind' })
 		Library.ToggleKeybind = Options.MenuKeybind
 
@@ -3805,12 +3805,11 @@ do --// PreLoad
 			Default = true,
 		})
 
-		gMisc
-			:AddToggle('ShowWatermark', {
-				Text = 'Show Watermark',
-				Default = false,
-			})
-			:OnChanged(Library:SetWatermarkVisibility)
+		gMisc:AddToggle('ShowWatermark', {
+			Text = 'Show Watermark',
+			Default = false,
+			Callback = Library.SetWatermarkVisibility,
+		})
 
 		gMisc
 			:AddToggle('ShowKeybindsMenu', {
