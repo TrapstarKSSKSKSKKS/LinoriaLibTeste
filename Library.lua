@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.23.7')
+print('Loading Linoria UI v2.23.8')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -1143,7 +1143,7 @@ do
 
 			ContainerLabel.Text = string.format('[%s] %s (%s)', KeyPicker.Value, Info.Text, KeyPicker.Mode)
 
-			ContainerLabel.Visible = Info.NoUI
+			ContainerLabel.Visible = not Info.NoUI
 			ContainerLabel.TextColor3 = State and Library.AccentColor or Library.FontColor
 
 			Library.RegistryMap[ContainerLabel].Properties.TextColor3 = State and 'AccentColor' or 'FontColor'
