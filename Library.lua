@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.20.2')
+print('Loading Linoria UI v2.20.3')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -163,7 +163,6 @@ function Library:Create(Class, Properties)
 	if type(Class) == 'string' then _Instance = Instance.new(Class) end
 
 	for Property, Value in next, Properties do
-		wait()
 		_Instance[Property] = Value
 	end
 
@@ -3714,7 +3713,7 @@ do --// PreLoad
 	local ThemeManager = LoadFromGithub('TrapstarKSSKSKSKKS', 'LinoriaLib', 'addons/ThemeManager.lua')
 	local win = Library:CreateWindow(string.format('TrapHub | %s', GameName or 'Universal'), true)
 	local tSettings = win:AddTab('Settings', 100)
-	local tUI = win:AddTab('Webhook', 101)
+	local tUI = win:AddTab('UI', 101)
 
 	ThemeManager:SetLibrary(Library)
 	ThemeManager:SetFolder('Trap Hub')
@@ -3818,14 +3817,14 @@ do --// PreLoad
 				Text = 'Show Keybinds Menu',
 				Default = false,
 			})
-			:OnChanged(LPH_JIT_MAX(function(t) Library.KeybindFrame.Visible = t end))
+			:OnChanged(function(t) Library.KeybindFrame.Visible = t end)
 
 		gMisc
 			:AddToggle('ShowNotifications', {
 				Text = 'Show Notifications',
 				Default = true,
 			})
-			:OnChanged(LPH_JIT_MAX(function(t) Library.NotificationArea.Visible = t end))
+			:OnChanged(function(t) Library.NotificationArea.Visible = t end)
 	end
 end
 
