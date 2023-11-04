@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.22.5')
+print('Loading Linoria UI v2.22.6')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -3606,7 +3606,7 @@ function Library:CreateWindow(...)
 			]]
 		end
 
-		if self.ToggleAnimation then
+		if Library.ToggleAnimation then
 			for _, Desc in ipairs(Outer:GetDescendants()) do
 				local Properties = {}
 
