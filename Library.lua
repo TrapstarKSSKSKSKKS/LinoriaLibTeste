@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.22.7')
+print('Loading Linoria UI v2.22.8')
 
 -- violin-suzutsuki i love you !!!!!!
 
