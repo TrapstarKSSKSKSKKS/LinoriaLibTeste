@@ -163,6 +163,7 @@ function Library:Create(Class, Properties)
 	if type(Class) == 'string' then _Instance = Instance.new(Class) end
 
 	for Property, Value in next, Properties do
+		wait()
 		_Instance[Property] = Value
 	end
 
