@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.23.4')
+print('Loading Linoria UI v2.23.5')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -1189,6 +1189,8 @@ do
 			KeyPicker.Value = Key
 			ModeButtons[Mode]:Select()
 			KeyPicker:Update()
+			Library:SafeCallback(KeyPicker.ChangedCallback, KeyPicker.Value)
+			Library:SafeCallback(KeyPicker.Changed, KeyPicker.Value)
 		end
 
 		function KeyPicker:OnClick(Callback) KeyPicker.Clicked = Callback end
