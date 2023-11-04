@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.22.6')
+print('Loading Linoria UI v2.22.7')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -3711,7 +3711,7 @@ do --// PreLoad
 	end
 
 	local ThemeManager = LoadFromGithub('TrapstarKSSKSKSKKS', 'LinoriaLib', 'addons/ThemeManager.lua')
-	local win = Library:CreateWindow(string.format('TrapHub | %s', GameName or 'Universal'), true)
+	local win = Library:CreateWindow({ Title = string.format('TrapHub | %s', GameName or 'Universal'), Center = true, AutoShow = false })
 	local tSettings = win:AddTab('Settings', 100)
 	local tUI = win:AddTab('UI', 101)
 
