@@ -1,8 +1,10 @@
-print('Loading SaveManager v1.0.1')
+print("Loading SaveManager v1.0.2")
 
 local httpService = game:GetService("HttpService")
 
-local SaveManager = {}
+local SaveManager = {
+	configvars = {},
+}
 
 SaveManager.Folder = "LinoriaLibSettings"
 SaveManager.Ignore = {}
@@ -90,6 +92,7 @@ function SaveManager:Save(name)
 
 	local data = {
 		objects = {},
+		configvars = SaveManager.configvars,
 	}
 
 	for idx, toggle in pairs(Toggles) do
@@ -135,6 +138,8 @@ function SaveManager:Load(name)
 			end)
 		end
 	end
+
+	SaveManager.configvars = decoded.configvars
 
 	return true
 end
