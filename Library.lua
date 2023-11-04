@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.23.6')
+print('Loading Linoria UI v2.23.7')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -1138,16 +1138,12 @@ do
 			ModeButtons[Mode] = ModeButton
 		end
 
-		function KeyPicker:RemoveUI(toggle) ContainerLabel.Visible = toggle end
-
 		function KeyPicker:Update()
-			if Info.NoUI then return end
-
 			local State = KeyPicker:GetState()
 
 			ContainerLabel.Text = string.format('[%s] %s (%s)', KeyPicker.Value, Info.Text, KeyPicker.Mode)
 
-			ContainerLabel.Visible = true
+			ContainerLabel.Visible = Info.NoUI
 			ContainerLabel.TextColor3 = State and Library.AccentColor or Library.FontColor
 
 			Library.RegistryMap[ContainerLabel].Properties.TextColor3 = State and 'AccentColor' or 'FontColor'
@@ -1189,8 +1185,6 @@ do
 			KeyPicker.Value = Key
 			ModeButtons[Mode]:Select()
 			KeyPicker:Update()
-			Library:SafeCallback(KeyPicker.ChangedCallback, KeyPicker.Value)
-			Library:SafeCallback(KeyPicker.Changed, KeyPicker.Value)
 		end
 
 		function KeyPicker:OnClick(Callback) KeyPicker.Clicked = Callback end
