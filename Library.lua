@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.23.8')
+print('Loading Linoria UI v2.23.9')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -3547,15 +3547,18 @@ function Library:CreateWindow(...)
 		Toggled = not Toggled
 		ModalElement.Modal = Toggled
 
+		if FirstToggle and Toggled then
+			FirstToggle = false
+			if Library.Onload then
+				print('Onload')
+				Library:SafeCallback(Library.OnLoad)
+			end
+		end
+
 		if Toggled then
 			-- A bit scuffed, but if we're going from not toggled -> toggled we want to show the frame immediately so that the fade is visible.
 			if InputService.TouchEnabled and not InputService.KeyboardEnabled and not InputService.MouseEnabled then Config.Size = UDim2.fromOffset(GetResizeUI()) end
 			Outer.Visible = true
-
-			if FirstToggle then
-				FirstToggle = false
-				if Library.Onload then task.spawn(Library.Onload) end
-			end
 
 			--[[
 			task.spawn(function()
