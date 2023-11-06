@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.23.9')
+print('Loading Linoria UI v2.24.0')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -59,6 +59,9 @@ local Library = {
 	ToggleAnimation = true,
 
 	Tabs = {},
+
+	OnUnloads = {},
+	OnLoads = {},
 }
 
 local RainbowStep = 0
@@ -410,15 +413,17 @@ function Library:Unload()
 	end
 
 	-- Call our unload callback, maybe to undo some hooks etc
-	if Library.OnUnload then Library.OnUnload() end
+	for _, Callback in next, Library.OnUnloads do
+		spawn(function() Library:SafeCallback(Callback) end)
+	end
 
 	Library.Unloaded = true
 	ScreenGui:Destroy()
 end
 
-function Library:OnUnload(Callback) Library.OnUnload = Callback end
+function Library:OnUnload(Callback) table.insert(Library.OnUnloads, Callback) end
 
-function Library:OnLoad(Callback) Library.OnLoad = Callback end
+function Library:OnLoad(Callback) table.insert(Library.OnLoads, Callback) end
 
 Library:GiveSignal(ScreenGui.DescendantRemoving:Connect(function(Instance)
 	if Library.RegistryMap[Instance] then Library:RemoveFromRegistry(Instance) end
@@ -3549,9 +3554,8 @@ function Library:CreateWindow(...)
 
 		if FirstToggle and Toggled then
 			FirstToggle = false
-			if Library.Onload then
-				print('Onload')
-				Library:SafeCallback(Library.OnLoad)
+			for _, func in next, Library.OnLoads do
+				spawn(function() Library:SafeCallback(func) end)
 			end
 		end
 
