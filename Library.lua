@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.12')
+print('Loading Linoria UI v2.26.13')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -367,9 +367,12 @@ function Library:OnHighlight(HighlightInstance, Instance, Properties, Properties
 		local Reg = Library.RegistryMap[Instance]
 
 		for Property, ColorIdx in pairs(Properties) do
-			Instance[Property] = Library[ColorIdx] or ColorIdx
-
-			if Reg and Reg.Properties[Property] then Reg.Properties[Property] = ColorIdx end
+			if Reg and Reg.Properties[Property] then
+				Library.RegistryMap[Instance].Properties[Property] = ColorIdx
+				Library.ThemeUpdate:Fire(true)
+			else
+				Instance[Property] = Library[ColorIdx] or ColorIdx
+			end
 		end
 	end)
 
@@ -377,9 +380,12 @@ function Library:OnHighlight(HighlightInstance, Instance, Properties, Properties
 		local Reg = Library.RegistryMap[Instance]
 
 		for Property, ColorIdx in pairs(PropertiesDefault) do
-			Instance[Property] = Library[ColorIdx] or ColorIdx
-
-			if Reg and Reg.Properties[Property] then Reg.Properties[Property] = ColorIdx end
+			if Reg and Reg.Properties[Property] then
+				Library.RegistryMap[Instance].Properties[Property] = ColorIdx
+				Library.ThemeUpdate:Fire(true)
+			else
+				Instance[Property] = Library[ColorIdx] or ColorIdx
+			end
 		end
 	end)
 end
@@ -3668,9 +3674,9 @@ function Library:CreateWindow(...)
 		Library:AddToRegistry(Cursor, { Color = 'AccentColor' })
 
 		local function UpdateCursor()
-			local Visi = Toggled and ScreenGui.Parent and Library.CustomCursor
+			local Visi = Toggled and Library.CustomCursor
 			Cursor.Visible, CursorOutline.Visible = Visi, Visi
-			InputService.MouseIconEnabled = not Visi
+			InputService.MouseIconEnabled = Visi == false
 
 			local mPos = InputService:GetMouseLocation()
 			Cursor.PointA, Cursor.PointB, Cursor.PointC = Vector2.new(mPos.X, mPos.Y), Vector2.new(mPos.X + 16, mPos.Y + 6), Vector2.new(mPos.X + 6, mPos.Y + 16)
