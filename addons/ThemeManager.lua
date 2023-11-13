@@ -1,4 +1,4 @@
-print('ThemeManager v1.0.6')
+print('ThemeManager v1.0.7')
 
 local httpService = game:GetService('HttpService')
 local ThemeManager = {}
