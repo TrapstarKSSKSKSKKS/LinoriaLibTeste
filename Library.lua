@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.24.0')
+print('Loading Linoria UI v2.26.0')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -48,6 +48,7 @@ local Library = {
 
 	Black = Color3.new(0, 0, 0),
 	Font = Enum.Font.Code,
+	Rainbow = false,
 
 	OpenedFrames = {},
 	DependencyBoxes = {},
@@ -58,34 +59,22 @@ local Library = {
 	CustomCursor = false,
 	ToggleAnimation = true,
 
+	NotifyOnError = false,
+
 	Tabs = {},
 
 	OnUnloads = {},
 	OnLoads = {},
+
+	CurrentRainbowHue = 0,
+	CurrentRainbowColor = Color3.fromRGB(0, 0, 0),
+	CurrentRainbowRGB = Color3.fromRGB(0, 0, 0),
+
+	Unloaded = false,
+
+	RainbowSignal = nil,
+	ThemeUpdate = nil,
 }
-
-local RainbowStep = 0
-local Hue = 0
-
-table.insert(
-	Library.Signals,
-	RenderStepped:Connect(function(Delta)
-		RainbowStep = RainbowStep + Delta
-
-		if RainbowStep >= (1 / 60) then
-			RainbowStep = 0
-
-			Hue = Hue + (1 / 400)
-
-			if Hue > 1 then Hue = 0 end
-
-			--[[
-			Library.CurrentRainbowHue = Hue
-			Library.CurrentRainbowColor = Color3.fromHSV(Hue, 0.8, 1)
-			]]
-		end
-	end)
-)
 
 local function GetResizeUI()
 	local X, Y = 550, 600
@@ -111,10 +100,103 @@ local function onScreenTouch(Input, gameProcessedEvent)
 end
 
 local function ClickTouch(input)
-	if not Input then return end
+	if not input then return end
 	if (pcall(function() return input.UserInputState == Enum.UserInputState.Begin end) and input.UserInputState == Enum.UserInputState.Begin) and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1) and not isGameProcess then return true end
 	return false
 end
+
+do --// Signals
+	-- This is a Aztup Hub signal library | Credits to Aztup for this
+	-- Lua-side duplication of the API of events on Roblox objects.
+	-- reference rather than by value where possible, as the BindableEvent objects
+	-- always pass signal arguments by value, meaning tables will be deep copied.
+	-- Roblox's deep copy method parses to a non-lua table compatable format.
+	Signal = {}
+	getgenv().Signal = Signal
+	Signal.__index = Signal
+	Signal.ClassName = 'Signal'
+
+	--- Creates a new Signal object.
+	-- @return A new Signal object.
+	function Signal.new()
+		local self = setmetatable({}, Signal)
+
+		self._bindableEvent = Instance.new('BindableEvent')
+		self._argData = nil
+		self._argCount = nil -- Prevent edge case of :Fire("A", nil) --> "A" instead of "A", nil
+
+		return self
+	end
+
+	--- Checks if an object is a Signal.
+	-- @param object The object to check.
+	-- @return True if the object is a Signal, false otherwise.
+	function Signal.isSignal(object) return typeof(object) == 'table' and getmetatable(object) == Signal end
+
+	--- Fires the Signal with the given arguments.
+	-- @param ... The arguments to pass to the Signal's connected functions.
+	function Signal:Fire(...)
+		self._argData = { ... }
+		self._argCount = select('#', ...)
+		self._bindableEvent:Fire()
+		self._argData = nil
+		self._argCount = nil
+	end
+
+	--- Connects a function to the Signal.
+	-- @param handler The function to connect to the Signal.
+	-- @return The connection object.
+	function Signal:Connect(handler)
+		if not self._bindableEvent then return error('Signal has been destroyed') end --Fixes an error while respawning with the UI injected
+
+		if not (type(handler) == 'function') then error(('connect(%s)'):format(typeof(handler)), 2) end
+
+		return self._bindableEvent.Event:Connect(function() handler(unpack(self._argData, 1, self._argCount)) end)
+	end
+
+	--- Waits for the Signal to be fired, and returns the arguments it was given.
+	-- @return The arguments passed to the Signal's connected functions.
+	function Signal:Wait()
+		self._bindableEvent.Event:Wait()
+		assert(self._argData, 'Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.')
+		return unpack(self._argData, 1, self._argCount)
+	end
+
+	--- Disconnects all connected events to the Signal. Voids the Signal as unusable.
+	function Signal:Destroy()
+		if self._bindableEvent then
+			self._bindableEvent:Destroy()
+			self._bindableEvent = nil
+		end
+
+		self._argData = nil
+		self._argCount = nil
+	end
+end
+
+local RainbowStep = 0
+local Hue = 0
+Library.RainbowSignal = Signal.new()
+Library.ThemeUpdate = Signal.new()
+table.insert(
+	Library.Signals,
+	RenderStepped:Connect(function(Delta)
+		RainbowStep = RainbowStep + Delta
+
+		if RainbowStep >= (1 / 60) then
+			RainbowStep = 0
+
+			Hue = Hue + (1 / 400)
+
+			if Hue > 1 then Hue = 0 end
+
+			Library.CurrentRainbowHue = Hue
+			Library.CurrentRainbowColor = Color3.fromHSV(Hue, 0.8, 1)
+			Library.CurrentRainbowRGB = Color3.fromRGB(Library.CurrentRainbowColor.R * 255, Library.CurrentRainbowColor.G * 255, Library.CurrentRainbowColor.B * 255)
+			Library.RainbowSignal:Fire(Library.CurrentRainbowHue, Library.CurrentRainbowColor, Library.CurrentRainbowRGB)
+		end
+	end)
+)
 
 local function GetPlayersString()
 	local PlayerList = Players:GetPlayers()
@@ -374,26 +456,32 @@ function Library:RemoveFromRegistry(Instance)
 	end
 end
 
-function Library:UpdateColorsUsingRegistry()
-	-- TODO: Could have an 'active' list of objects
-	-- where the active list only contains Visible objects.
+function Library:CheckInRegistry(Instance) return Library.RegistryMap[Instance] ~= nil end
 
-	-- IMPL: Could setup .Changed events on the AddToRegistry function
-	-- that listens for the 'Visible' propert being changed.
-	-- Visible: true => Add to active list, and call UpdateColors function
-	-- Visible: false => Remove from active list.
-
-	-- The above would be especially efficient for a rainbow menu color or live color-changing.
-
-	for Idx, Object in pairs(Library.Registry) do
+do --// UpdateColors using registry
+	for _, Object in ipairs(Library.Registry) do
 		for Property, ColorIdx in pairs(Object.Properties) do
-			if type(ColorIdx) == 'string' then
-				Object.Instance[Property] = Library[ColorIdx]
-			elseif type(ColorIdx) == 'function' then
-				Object.Instance[Property] = ColorIdx()
-			end
+			local Instance = Object.Instance
+			Library.ThemeUpdate:Connect(function()
+				if Library:CheckInRegistry(Instance) then
+					local ColorIdx = Object.Properties[Property]
+					if type(ColorIdx) == 'string' and not (ColorIdx == 'AccentColor' and Library.Rainbow) then
+						Instance[Property] = Library[ColorIdx]
+					elseif type(ColorIdx) == 'function' then
+						Instance[Property] = ColorIdx()
+					end
+				end
+			end)
+
+			if ColorIdx == 'AccentColor' then Library.RainbowSignal:Connect(function(_, _, RainbowColor)
+				if Library:CheckInRegistry(Instance) and Object.Properties[Property] == 'AccentColor' and Library.Rainbow then Instance[Property] = RainbowColor end
+			end) end
 		end
 	end
+
+	function Library:UpdateColorsUsingRegistry() Library.ThemeUpdate:Fire() end
+
+	Library:UpdateColorsUsingRegistry()
 end
 
 function Library:GiveSignal(Signal)
@@ -406,6 +494,9 @@ Library:GiveSignal(InputService.InputChanged:Connect(onScreenTouch))
 Library:GiveSignal(InputService.InputEnded:Connect(onScreenTouch))
 
 function Library:Unload()
+	Library.ThemeUpdate:Destroy()
+	Library.RainbowSignal:Destroy()
+
 	-- Unload all of the signals
 	for Idx = #Library.Signals, 1, -1 do
 		local Connection = table.remove(Library.Signals, Idx)
@@ -3078,6 +3169,8 @@ function Library:CreateWindow(...)
 	})
 
 	function Window:SetWindowTitle(Title) WindowLabel.Text = Title end
+	function Library:SetWindowSize(X, Y) Outer.Size = UDim2.fromOffset(X, Y) end
+	function Library:SetWindowPosition(X, Y) Outer.Position = UDim2.fromOffset(X, Y) end
 
 	function Window:AddTab(Name, pos)
 		local Tab = {
@@ -3543,6 +3636,39 @@ function Library:CreateWindow(...)
 	local Toggled = false
 	local Fading = false
 	local FirstToggle = true
+	local Cursor, CursorOutline
+
+	if Drawing then
+		local Cursor = Drawing.new('Triangle')
+		local CursorOutline = Drawing.new('Triangle')
+		local Connection
+		local State = InputService.MouseIconEnabled
+
+		Cursor.Thickness, Cursor.Filled, Cursor.Visible, Cursor.Color = 1, true, false, Library.AccentColor
+		CursorOutline.Thickness, CursorOutline.Filled, CursorOutline.Visible, CursorOutline.Color = 1, false, false, Color3.new(0, 0, 0)
+
+		Library:AddToRegistry(Cursor, { Color = 'AccentColor' })
+
+		local function UpdateCursor()
+			local Visi = Toggled and ScreenGui.Parent and Library.CustomCursor
+			Cursor.Visible, CursorOutline.Visible = Visi, Visi
+			InputService.MouseIconEnabled = not Visi
+
+			local mPos = InputService:GetMouseLocation()
+			Cursor.PointA, Cursor.PointB, Cursor.PointC = Vector2.new(mPos.X, mPos.Y), Vector2.new(mPos.X + 16, mPos.Y + 6), Vector2.new(mPos.X + 6, mPos.Y + 16)
+
+			CursorOutline.PointA, CursorOutline.PointB, CursorOutline.PointC = Cursor.PointA, Cursor.PointB, Cursor.PointC
+		end
+
+		Connection = RenderStepped:Connect(UpdateCursor)
+		UpdateCursor()
+
+		Library.DisableCursor = function()
+			if Connection then Connection:Disconnect() end
+			if Cursor then Cursor:Remove() end
+			if CursorOutline then CursorOutline:Remove() end
+		end
+	end
 
 	function Library:Toggle()
 		if Fading then return end
@@ -3561,54 +3687,10 @@ function Library:CreateWindow(...)
 
 		if Toggled then
 			-- A bit scuffed, but if we're going from not toggled -> toggled we want to show the frame immediately so that the fade is visible.
-			if InputService.TouchEnabled and not InputService.KeyboardEnabled and not InputService.MouseEnabled then Config.Size = UDim2.fromOffset(GetResizeUI()) end
+			-- if InputService.TouchEnabled and not InputService.KeyboardEnabled and not InputService.MouseEnabled then Config.Size = UDim2.fromOffset(GetResizeUI()) end
+
+			Outer.Size = UDim2.fromOffset(GetResizeUI())
 			Outer.Visible = true
-
-			--[[
-			task.spawn(function()
-				-- TODO: add cursor fade?
-				local State = InputService.MouseIconEnabled
-
-				local Cursor = Drawing.new('Triangle')
-				Cursor.Thickness = 1
-				Cursor.Filled = true
-				Cursor.Visible = false
-
-				local CursorOutline = Drawing.new('Triangle')
-				CursorOutline.Thickness = 1
-				CursorOutline.Filled = false
-				CursorOutline.Color = Color3.new(0, 0, 0)
-				CursorOutline.Visible = false
-
-				while Toggled and ScreenGui.Parent do
-					local Visi = Library.CustomCursor
-					Cursor.Visible = Visi
-					CursorOutline.Visible = Visi
-					InputService.MouseIconEnabled = Visi == false
-
-					local mPos = InputService:GetMouseLocation()
-					Cursor.Color = Library.AccentColor
-					Cursor.PointA = Vector2.new(mPos.X, mPos.Y)
-					Cursor.PointB = Vector2.new(mPos.X + 16, mPos.Y + 6)
-					Cursor.PointC = Vector2.new(mPos.X + 6, mPos.Y + 16)
-
-					CursorOutline.PointA = Cursor.PointA
-					CursorOutline.PointB = Cursor.PointB
-					CursorOutline.PointC = Cursor.PointC
-					RenderStepped:Wait()
-					wait()
-				end
-
-				InputService.MouseIconEnabled = State
-
-				if Cursor then
-					Cursor:Remove()
-				end
-				if CursorOutline then
-					CursorOutline:Remove()
-				end
-			end)
-			]]
 		end
 
 		if Library.ToggleAnimation then
