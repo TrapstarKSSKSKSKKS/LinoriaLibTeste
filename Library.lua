@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.11')
+print('Loading Linoria UI v2.26.12')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -466,7 +466,7 @@ do --// UpdateColors using registry
 		for Property, ColorIdx in pairs(Data.Properties) do
 			Library.ThemeUpdate:Connect(function(update)
 				if Library:CheckInRegistry(Instance) then
-					local Object = Library.Registry[Idx]
+					local Object = Library.RegistryMap[Instance]
 					local ColorIdx = Object.Properties[Property]
 					if type(ColorIdx) == 'string' then
 						if ColorIdx == 'AccentColor' and Library.Rainbow then
@@ -481,8 +481,10 @@ do --// UpdateColors using registry
 			end)
 
 			Library.RainbowSignal:Connect(function(_, _, RainbowColor)
-				local Object = Library.Registry[Idx]
-				if Library:CheckInRegistry(Instance) and Object.Properties[Property] == 'AccentColor' and Library.Rainbow then Instance[Property] = RainbowColor end
+				if Library:CheckInRegistry(Instance) then
+					local Object = Library.RegistryMap[Instance]
+					if Object.Properties[Property] == 'AccentColor' and Library.Rainbow then Instance[Property] = RainbowColor end
+				end
 			end)
 		end
 	end)
@@ -2823,8 +2825,6 @@ do
 		Visible = false,
 		Parent = ScreenGui,
 	})
-
-	getgenv().UpdatePositionWaterMark = function(X, Y) WatermarkOuter.Position = UDim2.new(0, X, 0, Y) end
 
 	local WatermarkInner = Library:Create('Frame', {
 		BackgroundColor3 = Library.MainColor,
