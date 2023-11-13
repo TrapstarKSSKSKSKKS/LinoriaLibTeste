@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.13')
+print('Loading Linoria UI v2.26.14')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -179,23 +179,16 @@ local Hue = 0
 Library.RainbowSignal = Signal.new()
 Library.ThemeUpdate = Signal.new()
 Library.RegistryAdded = Signal.new()
+
 table.insert(
 	Library.Signals,
 	RenderStepped:Connect(function(Delta)
-		RainbowStep = RainbowStep + Delta
-
-		if RainbowStep >= (1 / 60) then
-			RainbowStep = 0
-
-			Hue = Hue + (1 / 400)
-
-			if Hue > 1 then Hue = 0 end
-
-			Library.CurrentRainbowHue = Hue
-			Library.CurrentRainbowColor = Color3.fromHSV(Hue, 0.8, 1)
-			Library.CurrentRainbowRGB = Color3.fromRGB(Library.CurrentRainbowColor.R * 255, Library.CurrentRainbowColor.G * 255, Library.CurrentRainbowColor.B * 255)
-			Library.RainbowSignal:Fire(Library.CurrentRainbowHue, Library.CurrentRainbowColor, Library.CurrentRainbowRGB)
-		end
+		local Hue = tick() % 5 / 5
+		Library.CurrentRainbowHue = Hue
+		Library.CurrentRainbowColor = Color3.fromHSV(Hue, 0.8, 1)
+		Library.CurrentRainbowRGB = Color3.fromRGB(Library.CurrentRainbowColor.R * 255, Library.CurrentRainbowColor.G * 255, Library.CurrentRainbowColor.B * 255)
+		Library.RainbowSignal:Fire(Hue, Library.CurrentRainbowColor, Library.CurrentRainbowRGB)
+		RenderStepped:Wait()
 	end)
 )
 
@@ -443,7 +436,6 @@ function Library:AddToRegistry(Instance, Properties, IsHud)
 
 	table.insert(Library.Registry, Data)
 	Library.RegistryMap[Instance] = Data
-
 	Library.RegistryAdded:Fire(Instance, Data, Idx)
 
 	if IsHud then table.insert(Library.HudRegistry, Data) end
@@ -470,26 +462,26 @@ function Library:CheckInRegistry(Instance) return Library.RegistryMap[Instance] 
 do --// UpdateColors using registry
 	Library.RegistryAdded:Connect(function(Instance, Data, Idx)
 		for Property, ColorIdx in pairs(Data.Properties) do
+			Library.RainbowSignal:Connect(function(_, _, RainbowColor)
+				local Object = Library.RegistryMap[Instance]
+				if Object then
+					if Object.Properties[Property] == 'AccentColor' and Library.Rainbow then Instance[Property] = RainbowColor end
+				end
+			end)
+
 			Library.ThemeUpdate:Connect(function(update)
-				if Library:CheckInRegistry(Instance) then
+				local Object = Library.RegistryMap[Instance]
+				if Object then
 					local Object = Library.RegistryMap[Instance]
 					local ColorIdx = Object.Properties[Property]
 					if type(ColorIdx) == 'string' then
 						if ColorIdx == 'AccentColor' and Library.Rainbow then
-							Instance[Property] = Library.CurrentRainbowRGB
 						else
 							Instance[Property] = Library[ColorIdx]
 						end
 					elseif type(ColorIdx) == 'function' then
 						Instance[Property] = ColorIdx()
 					end
-				end
-			end)
-
-			Library.RainbowSignal:Connect(function(_, _, RainbowColor)
-				if Library:CheckInRegistry(Instance) then
-					local Object = Library.RegistryMap[Instance]
-					if Object.Properties[Property] == 'AccentColor' and Library.Rainbow then Instance[Property] = RainbowColor end
 				end
 			end)
 		end
