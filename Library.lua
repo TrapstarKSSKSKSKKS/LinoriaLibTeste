@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.3')
+print('Loading Linoria UI v2.26.5')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -2810,6 +2810,8 @@ do
 		Parent = ScreenGui,
 	})
 
+	getgenv().UpdatePositionWaterMark = function(X, Y) WatermarkOuter.Position = UDim2.new(0, X, 0, Y) end
+
 	local WatermarkInner = Library:Create('Frame', {
 		BackgroundColor3 = Library.MainColor,
 		BorderColor3 = Library.AccentColor,
@@ -3896,8 +3898,15 @@ do --// PreLoad
 
 		gMisc:AddToggle('CustomCursor', {
 			Text = 'Custom Cursor',
-			Default = true,
-			Callback = function(t) Library.CustomCursor = t end,
+			Default = false,
+			Callback = function(t)
+				if Drawing then
+					Library.CustomCursor = t
+				elseif t then
+					Library:Notify('Drawing is not supported on your exploit!', 3)
+					Toggles.CustomCursor:SerValue(false)
+				end
+			end,
 		})
 
 		gMisc:AddToggle('ShowWatermark', {
