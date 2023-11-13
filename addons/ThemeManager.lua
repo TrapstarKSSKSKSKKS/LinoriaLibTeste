@@ -1,4 +1,4 @@
-print('ThemeManager v1.0.3')
+print('ThemeManager v1.0.5')
 
 local httpService = game:GetService('HttpService')
 local ThemeManager = {}
@@ -55,10 +55,14 @@ function ThemeManager:ApplyTheme(theme)
 
 	local scheme = data[2]
 	for idx, col in pairs(customThemeData or scheme) do
-		self.Library[idx] = Color3.fromHex(col)
-
-		if Options[idx] then Options[idx]:SetValueRGB(Color3.fromHex(col)) end
-		if Toggles[idx] then Toggles[idx]:SetValue(col) end
+		if type(col) == 'boolean' then
+			self.Library[idx] = col
+			if Toggles[idx] then Toggles[idx]:SetValue(col) end
+			continue
+		else
+			self.Library[idx] = Color3.fromHex(col)
+			if Options[idx] then Options[idx]:SetValueRGB(Color3.fromHex(col)) end
+		end
 	end
 
 	self:ThemeUpdate()
