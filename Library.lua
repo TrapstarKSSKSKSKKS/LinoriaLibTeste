@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.5')
+print('Loading Linoria UI v2.26.6')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -463,10 +463,15 @@ do --// UpdateColors using registry
 		for Property, ColorIdx in pairs(Object.Properties) do
 			local Instance = Object.Instance
 			Library.ThemeUpdate:Connect(function()
+				print('ThemeUpdate', Instance, Library:CheckInRegistry(Instance))
 				if Library:CheckInRegistry(Instance) then
 					local ColorIdx = Object.Properties[Property]
-					if type(ColorIdx) == 'string' and not (ColorIdx == 'AccentColor' and Library.Rainbow) then
-						Instance[Property] = Library[ColorIdx]
+					if type(ColorIdx) == 'string' then
+						if ColorIdx == 'AccentColor' and Library.Rainbow then
+							Instance[Property] = Library.CurrentRainbowRGB
+						else
+							Instance[Property] = Library[ColorIdx]
+						end
 					elseif type(ColorIdx) == 'function' then
 						Instance[Property] = ColorIdx()
 					end
