@@ -1,4 +1,4 @@
-print('ThemeManager v1.0.5')
+print('ThemeManager v1.0.6')
 
 local httpService = game:GetService('HttpService')
 local ThemeManager = {}
@@ -165,7 +165,7 @@ function ThemeManager:CreateThemeManager(groupbox)
 	Options.AccentColor:OnChanged(UpdateTheme)
 	Options.OutlineColor:OnChanged(UpdateTheme)
 	Options.FontColor:OnChanged(UpdateTheme)
-	Options.Rainbow:OnChanged(UpdateTheme)
+	Toggles.Rainbow:OnChanged(UpdateTheme)
 end
 
 function ThemeManager:GetCustomTheme(file)
