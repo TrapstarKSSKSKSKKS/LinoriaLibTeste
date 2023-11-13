@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.14')
+print('Loading Linoria UI v2.26.15')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -360,12 +360,8 @@ function Library:OnHighlight(HighlightInstance, Instance, Properties, Properties
 		local Reg = Library.RegistryMap[Instance]
 
 		for Property, ColorIdx in pairs(Properties) do
-			if Reg and Reg.Properties[Property] then
-				Library.RegistryMap[Instance].Properties[Property] = ColorIdx
-				Library.ThemeUpdate:Fire(true)
-			else
-				Instance[Property] = Library[ColorIdx] or ColorIdx
-			end
+			Instance[Property] = Library[ColorIdx] or ColorIdx
+			if Reg and Reg.Properties[Property] then Reg.Properties[Property] = ColorIdx end
 		end
 	end)
 
@@ -373,12 +369,8 @@ function Library:OnHighlight(HighlightInstance, Instance, Properties, Properties
 		local Reg = Library.RegistryMap[Instance]
 
 		for Property, ColorIdx in pairs(PropertiesDefault) do
-			if Reg and Reg.Properties[Property] then
-				Library.RegistryMap[Instance].Properties[Property] = ColorIdx
-				Library.ThemeUpdate:Fire(true)
-			else
-				Instance[Property] = Library[ColorIdx] or ColorIdx
-			end
+			Instance[Property] = Library[ColorIdx] or ColorIdx
+			if Reg and Reg.Properties[Property] then Reg.Properties[Property] = ColorIdx end
 		end
 	end)
 end
@@ -1596,15 +1588,6 @@ do
 				Library:AddToRegistry(Label, { TextColor3 = 'RiskColor' })
 			end
 
-			Library:Create('UIGradient', {
-				Color = ColorSequence.new({
-					ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
-					ColorSequenceKeypoint.new(1, Color3.fromRGB(212, 212, 212)),
-				}),
-				Rotation = 90,
-				Parent = Inner,
-			})
-
 			Library:AddToRegistry(Outer, {
 				BorderColor3 = 'Black',
 			})
@@ -1612,6 +1595,15 @@ do
 			Library:AddToRegistry(Inner, {
 				BackgroundColor3 = 'MainColor',
 				BorderColor3 = 'OutlineColor',
+			})
+
+			Library:Create('UIGradient', {
+				Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+					ColorSequenceKeypoint.new(1, Color3.fromRGB(212, 212, 212)),
+				}),
+				Rotation = 90,
+				Parent = Inner,
 			})
 
 			Library:OnHighlight(Outer, Outer, { BorderColor3 = 'AccentColor' }, { BorderColor3 = 'Black' })
@@ -1800,6 +1792,10 @@ do
 		Library:AddToRegistry(TextBoxInner, {
 			BackgroundColor3 = 'MainColor',
 			BorderColor3 = 'OutlineColor',
+		})
+
+		Library:AddToRegistry(TextBoxOuter, {
+			BorderColor3 = 'Black',
 		})
 
 		Library:OnHighlight(TextBoxOuter, TextBoxOuter, { BorderColor3 = 'AccentColor' }, { BorderColor3 = 'Black' })
