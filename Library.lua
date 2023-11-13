@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.0')
+print('Loading Linoria UI v2.26.2')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -496,6 +496,7 @@ Library:GiveSignal(InputService.InputEnded:Connect(onScreenTouch))
 function Library:Unload()
 	Library.ThemeUpdate:Destroy()
 	Library.RainbowSignal:Destroy()
+	if Library.DisableCursor then Library.DisableCursor() end
 
 	-- Unload all of the signals
 	for Idx = #Library.Signals, 1, -1 do
@@ -2801,7 +2802,8 @@ do
 
 	local WatermarkOuter = Library:Create('Frame', {
 		BorderColor3 = Color3.new(0, 0, 0),
-		Position = UDim2.new(0, 100, 0, -25),
+		-- Position = UDim2.new(0, 100, 0, -25),
+		Position = UDim2.new(0, 100, 0, 5),
 		Size = UDim2.new(0, 213, 0, 20),
 		ZIndex = 200,
 		Visible = false,
@@ -3890,6 +3892,12 @@ do --// PreLoad
 		gMisc:AddToggle('BlackScreen', {
 			Text = 'Black Screen',
 			Default = true,
+		})
+
+		gMisc:AddToggle('CustomCursor', {
+			Text = 'Custom Cursor',
+			Default = true,
+			Callback = function(t) Library.CustomCursor = t end,
 		})
 
 		gMisc:AddToggle('ShowWatermark', {
