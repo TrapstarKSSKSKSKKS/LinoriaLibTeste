@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.8')
+print('Loading Linoria UI v2.26.10')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -178,6 +178,7 @@ local RainbowStep = 0
 local Hue = 0
 Library.RainbowSignal = Signal.new()
 Library.ThemeUpdate = Signal.new()
+Library.RegistryAdded = Signal.new()
 table.insert(
 	Library.Signals,
 	RenderStepped:Connect(function(Delta)
@@ -437,6 +438,8 @@ function Library:AddToRegistry(Instance, Properties, IsHud)
 	table.insert(Library.Registry, Data)
 	Library.RegistryMap[Instance] = Data
 
+	Library.RegistryAdded:Fire(Instance, Data, Idx)
+
 	if IsHud then table.insert(Library.HudRegistry, Data) end
 end
 
@@ -459,12 +462,12 @@ end
 function Library:CheckInRegistry(Instance) return Library.RegistryMap[Instance] ~= nil end
 
 do --// UpdateColors using registry
-	for _, Object in ipairs(Library.Registry) do
-		for Property, ColorIdx in pairs(Object.Properties) do
-			local Instance = Object.Instance
-			Library.ThemeUpdate:Connect(function()
-				print('ThemeUpdate', Instance, Library:CheckInRegistry(Instance))
+	Library.RegistryAdded:Connect(function(Instance, Data, Idx)
+		for Property, ColorIdx in pairs(Data.Properties) do
+			Library.ThemeUpdate:Connect(function(update)
+				print('ThemeUpdate', Instance, Library:CheckInRegistry(Instance), update)
 				if Library:CheckInRegistry(Instance) then
+					local Object = Library.Registry[Idx]
 					local ColorIdx = Object.Properties[Property]
 					if type(ColorIdx) == 'string' then
 						if ColorIdx == 'AccentColor' and Library.Rainbow then
@@ -478,13 +481,22 @@ do --// UpdateColors using registry
 				end
 			end)
 
-			if ColorIdx == 'AccentColor' then Library.RainbowSignal:Connect(function(_, _, RainbowColor)
-				if Library:CheckInRegistry(Instance) and Object.Properties[Property] == 'AccentColor' and Library.Rainbow then Instance[Property] = RainbowColor end
-			end) end
+			if ColorIdx == 'AccentColor' then
+				Library.RainbowSignal:Connect(function(_, _, RainbowColor)
+					local Object = Library.Registry[Idx]
+					if Library:CheckInRegistry(Instance) and Object.Properties[Property] == 'AccentColor' and Library.Rainbow then Instance[Property] = RainbowColor end
+				end)
+			end
+		end
+	end)
+
+	for _, Object in ipairs(Library.Registry) do
+		for Property, ColorIdx in pairs(Object.Properties) do
+			Library.RegistryAdded:Fire(Object.Instance, Object, Object.Idx)
 		end
 	end
 
-	function Library:UpdateColorsUsingRegistry() Library.ThemeUpdate:Fire() end
+	function Library:UpdateColorsUsingRegistry() Library.ThemeUpdate:Fire(true) end
 
 	Library:UpdateColorsUsingRegistry()
 end
@@ -2807,8 +2819,8 @@ do
 
 	local WatermarkOuter = Library:Create('Frame', {
 		BorderColor3 = Color3.new(0, 0, 0),
-		-- Position = UDim2.new(0, 100, 0, -25),
-		Position = UDim2.new(0, 100, 0, 5),
+		Position = UDim2.new(0, 100, 0, -25),
+		-- Position = UDim2.new(0, 100, 0, 5),
 		Size = UDim2.new(0, 213, 0, 20),
 		ZIndex = 200,
 		Visible = false,
