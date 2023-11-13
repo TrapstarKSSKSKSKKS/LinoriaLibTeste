@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.7')
+print('Loading Linoria UI v2.26.8')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -3919,8 +3919,6 @@ do --// PreLoad
 			Default = false,
 			Callback = function(t) Library:SetWatermarkVisibility(t) end,
 		})
-			end,
-			end,
 
 		gMisc
 			:AddToggle('ShowKeybindsMenu', {
