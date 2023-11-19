@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.20')
+print('Loading Linoria UI v2.26.21')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -3506,7 +3506,9 @@ function Library:CreateWindow(...)
 			})
 
 			function Tabbox:AddTab(Name)
-				local Tab = {}
+				local Tab = {
+					Text = Name,
+				}
 
 				local Button = Library:Create('Frame', {
 					BackgroundColor3 = Library.MainColor,
