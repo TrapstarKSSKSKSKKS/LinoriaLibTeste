@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.16')
+print('Loading Linoria UI v2.26.18')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -64,7 +64,13 @@ local Library = {
 	Tabs = {},
 
 	OnUnloads = {},
-	OnLoads = {},
+	OnLoads = setmetatable({}, {
+		__newindex = function(self, idx, val)
+			if Library.Loaded then spawn(function() Library:SafeCallback(val) end) end
+			rawset(self, idx, val)
+		end,
+	}),
+	Loaded = false,
 
 	CurrentRainbowHue = 0,
 	CurrentRainbowColor = Color3.fromRGB(0, 0, 0),
@@ -182,6 +188,7 @@ Library.RegistryAdded = Signal.new()
 
 task.spawn(function()
 	while true do
+		if Library.Unloaded then break end
 		RenderStepped:Wait()
 		local Hue = tick() % 5 / 5
 		Library.CurrentRainbowHue = Hue
@@ -402,7 +409,6 @@ function Library:GetTextBounds(Text, Font, Size, Resolution)
 	if not TextService then return 0, 0 end
 
 	local CleanText = Text:gsub('<[^>]+>', '')
-
 	if not TextBoundsCache[CleanText] then
 		local Bounds = TextService:GetTextSize(CleanText, Size, Font, Resolution or Vector2.new(1920, 1080))
 		TextBoundsCache[CleanText] = Bounds
@@ -453,14 +459,12 @@ function Library:CheckInRegistry(Instance) return Library.RegistryMap[Instance] 
 do --// UpdateColors using registry
 	Library.RegistryAdded:Connect(function(Instance, Data, Idx)
 		for Property, ColorIdx in pairs(Data.Properties) do
-			--[[
 			Library.RainbowSignal:Connect(function(_, _, RainbowColor)
 				local Object = Library.RegistryMap[Instance]
 				if Object then
 					if Object.Properties[Property] == 'AccentColor' and Library.Rainbow then Instance[Property] = RainbowColor end
 				end
 			end)
-			]]
 
 			Library.ThemeUpdate:Connect(function(update)
 				local Object = Library.RegistryMap[Instance]
@@ -2068,7 +2072,9 @@ do
 		assert(Info.Text, 'AddSlider: Missing slider text.')
 		assert(Info.Min, 'AddSlider: Missing minimum value.')
 		assert(Info.Max, 'AddSlider: Missing maximum value.')
-		assert(Info.Rounding, 'AddSlider: Missing rounding value.')
+
+		Info.HideText = Info.HideText or false
+		Info.Rounding = Info.Rounding or 0
 
 		local Slider = {
 			Value = Info.Default,
@@ -3648,7 +3654,6 @@ function Library:CreateWindow(...)
 	local TransparencyCache = {}
 	local Toggled = false
 	local Fading = false
-	local FirstToggle = true
 	local Cursor, CursorOutline
 
 	if Drawing then
@@ -3690,13 +3695,6 @@ function Library:CreateWindow(...)
 		Fading = true
 		Toggled = not Toggled
 		ModalElement.Modal = Toggled
-
-		if FirstToggle and Toggled then
-			FirstToggle = false
-			for _, func in next, Library.OnLoads do
-				spawn(function() Library:SafeCallback(func) end)
-			end
-		end
 
 		if Toggled then
 			-- A bit scuffed, but if we're going from not toggled -> toggled we want to show the frame immediately so that the fade is visible.
@@ -3939,5 +3937,10 @@ do --// PreLoad
 			:OnChanged(function(t) Library.NotificationArea.Visible = t end)
 	end
 end
+
+for _, func in next, Library.OnLoads do
+	spawn(function() Library:SafeCallback(func) end)
+end
+Library.OnLoads = {}
 
 return Library
