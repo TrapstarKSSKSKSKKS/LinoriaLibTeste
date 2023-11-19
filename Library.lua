@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.18')
+print('Loading Linoria UI v2.26.19')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -528,9 +528,9 @@ function Library:Unload()
 	ScreenGui:Destroy()
 end
 
-function Library:OnUnload(Callback) table.insert(Library.OnUnloads, Callback) end
+function Library:OnUnload(Callback) Library.OnUnloads[Callback] = Callback end
 
-function Library:OnLoad(Callback) table.insert(Library.OnLoads, Callback) end
+function Library:OnLoad(Callback) Library.OnLoads[Callback] = Callback end
 
 Library:GiveSignal(ScreenGui.DescendantRemoving:Connect(function(Instance)
 	if Library.RegistryMap[Instance] then Library:RemoveFromRegistry(Instance) end
