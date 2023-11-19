@@ -63,7 +63,12 @@ local Library = {
 
 	Tabs = {},
 
-	OnUnloads = {},
+	OnUnloads = setmetatable({}, {
+		__newindex = function(self, idx, val)
+			if Library.Unloaded then spawn(function() Library:SafeCallback(val) end) end
+			rawset(self, idx, val)
+		end,
+	}),
 	OnLoads = setmetatable({}, {
 		__newindex = function(self, idx, val)
 			if Library.Loaded then spawn(function() Library:SafeCallback(val) end) end
@@ -71,12 +76,11 @@ local Library = {
 		end,
 	}),
 	Loaded = false,
+	Unloaded = false,
 
 	CurrentRainbowHue = 0,
 	CurrentRainbowColor = Color3.fromRGB(0, 0, 0),
 	CurrentRainbowRGB = Color3.fromRGB(0, 0, 0),
-
-	Unloaded = false,
 
 	RainbowSignal = nil,
 	ThemeUpdate = nil,
@@ -3941,6 +3945,6 @@ end
 for _, func in next, Library.OnLoads do
 	spawn(function() Library:SafeCallback(func) end)
 end
-Library.OnLoads = {}
+Library.Loaded = true
 
 return Library
