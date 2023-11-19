@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.19')
+print('Loading Linoria UI v2.26.20')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -3447,6 +3447,7 @@ function Library:CreateWindow(...)
 		function Tab:AddTabbox(Info)
 			local Tabbox = {
 				Tabs = {},
+				Text = Info.Name,
 			}
 
 			local BoxOuter = Library:Create('Frame', {
