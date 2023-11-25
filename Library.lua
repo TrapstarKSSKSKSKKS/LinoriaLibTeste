@@ -1,4 +1,4 @@
-print('Loading Linoria UI v2.26.21')
+print('Loading Linoria UI v2.26.22')
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -189,7 +189,7 @@ local Hue = 0
 Library.RainbowSignal = Signal.new()
 Library.ThemeUpdate = Signal.new()
 Library.RegistryAdded = Signal.new()
-
+--[[
 task.spawn(function()
 	while true do
 		if Library.Unloaded then break end
@@ -201,6 +201,7 @@ task.spawn(function()
 		Library.RainbowSignal:Fire(Hue, Library.CurrentRainbowColor, Library.CurrentRainbowRGB)
 	end
 end)
+]]
 
 local function GetPlayersString()
 	local PlayerList = Players:GetPlayers()
@@ -463,12 +464,14 @@ function Library:CheckInRegistry(Instance) return Library.RegistryMap[Instance] 
 do --// UpdateColors using registry
 	Library.RegistryAdded:Connect(function(Instance, Data, Idx)
 		for Property, ColorIdx in pairs(Data.Properties) do
+			--[[
 			Library.RainbowSignal:Connect(function(_, _, RainbowColor)
 				local Object = Library.RegistryMap[Instance]
 				if Object then
 					if Object.Properties[Property] == 'AccentColor' and Library.Rainbow then Instance[Property] = RainbowColor end
 				end
 			end)
+			]]
 
 			Library.ThemeUpdate:Connect(function(update)
 				local Object = Library.RegistryMap[Instance]
