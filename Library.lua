@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.26.23")
+print("Loading Linoria UI v2.26.24")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -2109,8 +2109,6 @@ do
 
 			Groupbox:AddBlank(3)
 		end
-
-		if Info.Compact then Groupbox:AddBlank(2) end
 
 		local SliderOuter = Library:Create("Frame", {
 			BackgroundColor3 = Color3.new(0, 0, 0),
