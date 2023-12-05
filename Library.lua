@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.26.24")
+print("Loading Linoria UI v2.26.25")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -248,12 +248,23 @@ function Library:AttemptSave()
 end
 
 function Library:Create(Class, Properties)
+	Properties = Properties or {}
 	local _Instance = Class
 
-	if type(Class) == "string" then _Instance = Instance.new(Class) end
+	local a = Class == "Square" or Class == "Line" or Class == "Text" or Class == "Quad" or Class == "Circle" or Class == "Triangle"
 
-	for Property, Value in next, Properties do
-		_Instance[Property] = Value
+	if type(Class) == "string" then _Instance = (a and Drawing or Instance).new(Class) end
+
+	for Property, Value in pairs(Properties) do
+		if Property ~= "Parent" then
+			if typeof(v) == "Instance" then
+				Value.Parent = new
+			else
+				_Instance[Property] = Value
+			end
+		end
+
+		_Instance.Parent = Properties.Parent
 	end
 
 	return _Instance
@@ -3666,6 +3677,7 @@ function Library:CreateWindow(...)
 	local Fading = false
 	local Cursor, CursorOutline
 
+	--[[
 	if Drawing then
 		local Cursor = Drawing.new("Triangle")
 		local CursorOutline = Drawing.new("Triangle")
@@ -3697,6 +3709,7 @@ function Library:CreateWindow(...)
 			if CursorOutline then CursorOutline:Remove() end
 		end
 	end
+	]]
 
 	function Library:Toggle()
 		if Fading then return end
