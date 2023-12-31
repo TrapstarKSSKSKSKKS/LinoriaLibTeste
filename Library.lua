@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.26.25")
+print("Loading Linoria UI v2.27.0")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -2978,6 +2978,155 @@ function Library:SetWatermark(Text)
 	Library.WatermarkText.Text = Text
 end
 
+function Library:AddWarning(warning)
+	warning = typeof(warning) == "table" and warning or {}
+	warning.text = tostring(warning.text)
+	warning.type = warning.type or ""
+	local ZIndexDefault = 999
+
+	local function CreateBaseButton()
+		local Outer = Library:Create("Frame", {
+			BackgroundColor3 = Color3.new(0, 0, 0),
+			BorderColor3 = Color3.new(0, 0, 0),
+			Size = UDim2.new(1, -4, 0, 20),
+			ZIndex = ZIndexDefault + 5,
+		})
+
+		local Inner = Library:Create("Frame", {
+			BackgroundColor3 = Library.MainColor,
+			BorderColor3 = Library.OutlineColor,
+			BorderMode = Enum.BorderMode.Inset,
+			Size = UDim2.new(1, 0, 1, 0),
+			ZIndex = ZIndexDefault + 6,
+			Parent = Outer,
+		})
+
+		local Label = Library:CreateLabel({
+			Size = UDim2.new(1, 0, 1, 0),
+			TextSize = 14,
+			ZIndex = ZIndexDefault + 6,
+			Parent = Inner,
+		})
+
+		Library:AddToRegistry(Outer, {
+			BorderColor3 = "Black",
+		})
+
+		Library:AddToRegistry(Inner, {
+			BackgroundColor3 = "MainColor",
+			BorderColor3 = "OutlineColor",
+		})
+
+		Library:Create("UIGradient", {
+			Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(212, 212, 212)),
+			}),
+			Rotation = 90,
+			Parent = Inner,
+		})
+
+		Library:OnHighlight(Outer, Outer, { BorderColor3 = "AccentColor" }, { BorderColor3 = "Black" })
+
+		return Outer, Inner, Label
+	end
+
+	local answer
+	function warning:Show()
+		Library.warning = warning
+		if warning.main and warning.type == "" then
+			warning.main:Destroy()
+			warning.main = nil
+		end
+		
+		Library:SetWindowCenter()
+
+		if not warning.main then
+			warning.main = Library:Create("TextButton", {
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundTransparency = 0.3,
+				BackgroundColor3 = Color3.new(),
+				BorderSizePixel = 0,
+				Text = "",
+				AutoButtonColor = false,
+				Parent = Library.Outer,
+				ZIndex = ZIndexDefault,
+			})
+
+			warning.message = Library:CreateLabel({
+				ZIndex = ZIndexDefault + 2,
+				Position = UDim2.new(0, 20, 0.5, -60),
+				Size = UDim2.new(1, -40, 0, 40),
+				BackgroundTransparency = 1,
+				TextSize = 16,
+				TextWrapped = true,
+				RichText = true,
+				Parent = warning.main,
+			})
+
+			if warning.type == "confirm" then
+				local Outer1, Inner1, Label1 = CreateBaseButton()
+
+				Outer1.Size = UDim2.new(0, 100, 0, 20)
+				Outer1.Position = UDim2.new(0.5, -105, 0.5, -10)
+				Label1.Text = "Yes"
+				Outer1.Parent = warning.main
+
+				local Outer2, Inner2, Label2 = CreateBaseButton()
+				Outer2.Size = UDim2.new(0, 100, 0, 20)
+				Outer2.Position = UDim2.new(0.5, 5, 0.5, -10)
+				Label2.Text = "No"
+				Outer2.Parent = warning.main
+
+				local connect = Label1.InputBegan:connect(function(input)
+					if input.UserInputType.Name == "MouseButton1" then answer = true end
+				end)
+
+				local connect1 = Label2.InputBegan:connect(function(input)
+					if input.UserInputType.Name == "MouseButton1" then answer = false end
+				end)
+
+				Library:OnUnload(function()
+					connect:Disconnect()
+					connect1:Disconnect()
+				end)
+			else
+				local Outer, Inner, Label = CreateBaseButton()
+				Outer.Parent = warning.main
+				Outer.Size = UDim2.new(0, 100, 0, 20)
+				Outer.Position = UDim2.new(0.5, -50, 0.5, -10)
+				Label.Text = "OK"
+
+				local connect = Label.InputEnded:connect(function(input)
+					if input.UserInputType.Name == "MouseButton1" then answer = true end
+				end)
+
+				Library:OnUnload(function() connect:Disconnect() end)
+			end
+		end
+		warning.main.Visible = true
+		warning.message.Text = warning.text
+
+		repeat
+			task.wait()
+		until answer ~= nil
+		Library.warning = nil
+
+		local answerCopy = answer
+		warning:Close()
+
+		return answerCopy
+	end
+
+	function warning:Close()
+		answer = nil
+		if not warning.main then return end
+		warning.main.Visible = false
+	end
+
+	return warning
+end
+
 function Library:Notify(Text, Time, inf)
 	local XSize, YSize = Library:GetTextBounds(Text, Library.Font, 14)
 	local NotifyAddons = {}
@@ -3107,6 +3256,7 @@ function Library:CreateWindow(...)
 
 	local Window = {
 		Tabs = {},
+		TabsOrder = {},
 	}
 
 	if InputService.TouchEnabled and not InputService.KeyboardEnabled and not InputService.MouseEnabled then Config.Size = UDim2.fromOffset(GetResizeUI()) end
@@ -3207,7 +3357,15 @@ function Library:CreateWindow(...)
 
 	function Window:SetWindowTitle(Title) WindowLabel.Text = Title end
 	function Library:SetWindowSize(X, Y) Outer.Size = UDim2.fromOffset(X, Y) end
+	function Library:SetWindowCenter() Outer.Position = UDim2.fromScale(0.5, 0.5) end
 	function Library:SetWindowPosition(X, Y) Outer.Position = UDim2.fromOffset(X, Y) end
+	Library.Outer = Outer
+
+	function Window:ShowTab(pos)
+		local Tab = Window.Tabs[pos] or Window.TabsOrder[pos]
+		if not Tab then return end
+		Tab:ShowTab()
+	end
 
 	function Window:AddTab(Name, pos)
 		local Tab = {
@@ -3660,6 +3818,11 @@ function Library:CreateWindow(...)
 		if #TabContainer:GetChildren() == 1 then Tab:ShowTab() end
 
 		Window.Tabs[Name] = Tab
+		if GameName then
+			if Name == "Settings" or Name == "UI" then return Tab end
+		end
+		Window.TabsOrder[#Window.TabsOrder + 1] = Tab
+
 		return Tab
 	end
 
@@ -3776,6 +3939,7 @@ function Library:CreateWindow(...)
 	if Config.AutoShow then task.spawn(Library.Toggle) end
 
 	Window.Holder = Outer
+	Library.Window = Window
 
 	return Window
 end
