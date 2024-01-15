@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.28.0")
+print("Loading Linoria UI v2.28.1")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -17,11 +17,10 @@ local LocalPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 local Mouse = LocalPlayer:GetMouse()
 
-local IconTopBar = CoreGui:FindFirstChild("Icon") or game:GetObjects("rbxassetid://6311707237")[1]
+local IconTopBar = ReplicatedStorage:FindFirstChild("Icon") or game:GetObjects("rbxassetid://6311707237")[1]
 IconTopBar.Parent = ReplicatedStorage
 local IconModule = require(ReplicatedStorage.Icon)
 local IconThemes = require(ReplicatedStorage.Icon.Themes)
-IconTopBar.Parent = CoreGui
 local ToggleIcon
 
 local ProtectGui = protectgui or (syn and syn.protect_gui) or function() end
