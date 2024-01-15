@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.0")
+print("Loading Linoria UI v2.29.1")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -101,12 +101,17 @@ end)
 pcall(function()
 	local TextChatService = game:GetService("TextChatService")
 	local path = TextChatService.TextChatCommands
-	local command = path:FindFirstChild("traphub") or Instance.new("TextChatCommand")
+	local SystemChannel = TextChatService:FindFirstChild("RBXSystem", true)
+	local command = path:FindFirstChild("traphub") or Instance.new("TextChatCommand", path)
+	command = path:WaitForChild("traphub", 10)
 	command.Name = "traphub"
 	command.Enabled = true
 	command.PrimaryAlias = "/traphub"
 	command.SecondaryAlias = "/trap"
-	Command.Triggered:Connect(function(textSource, message) task.spawn(Library.Toggle) end)
+	command.Triggered:Connect(function(textSource, message)
+		SystemChannel:DisplaySystemMessage(string.format(" UI", Library.Window.Holder.Visible and "Closed" or "Opened"))
+		task.spawn(Library.Toggle)
+	end)
 end)
 
 local function GetResizeUI()
