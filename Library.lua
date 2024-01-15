@@ -17,10 +17,9 @@ local LocalPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 local Mouse = LocalPlayer:GetMouse()
 
-local IconTopBar = ReplicatedStorage:FindFirstChild("Icon") or game:GetObjects("rbxassetid://6311707237")[1]
-IconTopBar.Parent = ReplicatedStorage
-local IconModule = require(ReplicatedStorage.Icon)
-local IconThemes = require(ReplicatedStorage.Icon.Themes)
+local IconTopBar = game:GetObjects("rbxassetid://15998952594")[1]
+IconTopBar.Parent = CoreGui
+local IconModule = require(IconTopBar.ModuleScript)
 local ToggleIcon
 
 local ProtectGui = protectgui or (syn and syn.protect_gui) or function() end
@@ -3271,7 +3270,7 @@ function Library:CreateWindow(...)
 	if InputService.TouchEnabled and not InputService.KeyboardEnabled and not InputService.MouseEnabled then Config.Size = UDim2.fromOffset(GetResizeUI()) end
 
 	spawn(function()
-		ToggleIcon = IconModule.new():setImage("rbxassetid://15995238048"):setTip("Open Linoria UI"):bindEvent("selected", function() task.spawn(Library.Toggle) end):bindEvent("deselected", function() task.spawn(Library.Toggle) end)
+		ToggleIcon = IconModule.new():setImage(15995238018):bindEvent(function() task.spawn(Library.Toggle) end)
 		--[[
 	TextChatService.OnIncomingMessage = function(messageData, ...)
 		local player, message = Players:GetPlayerByUserId(messageData.TextSource.UserId), messageData.Text
