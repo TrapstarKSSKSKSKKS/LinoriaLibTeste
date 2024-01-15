@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.28.1")
+print("Loading Linoria UI v2.29.0")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -16,10 +16,7 @@ local RenderStepped = RunService.RenderStepped
 local LocalPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 local Mouse = LocalPlayer:GetMouse()
-
-local IconTopBar = game:GetObjects("rbxassetid://15998952594")[1]
-IconTopBar.Parent = CoreGui
-local IconModule = require(IconTopBar.ModuleScript)
+local IconModule
 local ToggleIcon
 
 local ProtectGui = protectgui or (syn and syn.protect_gui) or function() end
@@ -93,6 +90,24 @@ local Library = {
 	RainbowSignal = nil,
 	ThemeUpdate = nil,
 }
+
+pcall(function()
+	local IconTopBar = game:GetObjects("rbxassetid://15998952594")[1]
+	IconTopBar.Parent = CoreGui
+	IconModule = require(IconTopBar.ModuleScript)
+	ToggleIcon = IconModule.new():setImage(15995238018):bindEvent(function() task.spawn(Library.Toggle) end)
+end)
+
+pcall(function()
+	local TextChatService = game:GetService("TextChatService")
+	local path = TextChatService.TextChatCommands
+	local command = path:FindFirstChild("traphub") or Instance.new("TextChatCommand")
+	command.Name = "traphub"
+	command.Enabled = true
+	command.PrimaryAlias = "/traphub"
+	command.SecondaryAlias = "/trap"
+	Command.Triggered:Connect(function(textSource, message) task.spawn(Library.Toggle) end)
+end)
 
 local function GetResizeUI()
 	local X, Y = 550, 600
@@ -3268,24 +3283,6 @@ function Library:CreateWindow(...)
 	}
 
 	if InputService.TouchEnabled and not InputService.KeyboardEnabled and not InputService.MouseEnabled then Config.Size = UDim2.fromOffset(GetResizeUI()) end
-
-	spawn(function()
-		ToggleIcon = IconModule.new():setImage(15995238018):bindEvent(function() task.spawn(Library.Toggle) end)
-		--[[
-	TextChatService.OnIncomingMessage = function(messageData, ...)
-		local player, message = Players:GetPlayerByUserId(messageData.TextSource.UserId), messageData.Text
-
-		if not player or not message then return end
-
-		if message:sub(1, 1) == "/" then
-			local command = message:sub(2, #message):split(" ")[1]
-			local args = message:sub(#command + 3, #message):split(" ")
-
-			if command == "TrapHub" then Library:Toggle() end
-		end
-	end
-	]]
-	end)
 
 	local Outer = Library:Create("Frame", {
 		AnchorPoint = Config.AnchorPoint,
