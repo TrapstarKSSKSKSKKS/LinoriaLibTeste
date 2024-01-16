@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.3")
+print("Loading Linoria UI v2.29.4")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -91,21 +91,23 @@ local Library = {
 	ThemeUpdate = nil,
 }
 
-pcall(function()
-	local t = ReplicatedStorage:FindFirstChild("IconController", true)
-	IconModule = require(t and t.Parent or game:GetObjects("rbxassetid://6311707237")[1])
-	ToggleIcon = IconModule.new():setImage(16001024329):setTip("Open Linoria UI")
+spawn(function()
+	pcall(function()
+		local t = ReplicatedStorage:FindFirstChild("IconController", true)
+		IconModule = require(t and t.Parent or game:GetObjects("rbxassetid://6311707237")[1])
+		ToggleIcon = IconModule.new():setImage(16001024329):setTip("Open Linoria UI")
 
-	repeat
-		wait()
-	until Library.Toggle
+		repeat
+			wait()
+		until Library.Toggle
 
-	ToggleIcon:bindEvent("selected", function()
-		print("selected!")
-		task.spawn(function() Library:Toggle() end)
-	end):bindEvent("deselected", function()
-		print("deselected!")
-		task.spawn(function() Library:Toggle() end)
+		ToggleIcon:bindEvent("selected", function()
+			print("selected!")
+			task.spawn(function() Library:Toggle() end)
+		end):bindEvent("deselected", function()
+			print("deselected!")
+			task.spawn(function() Library:Toggle() end)
+		end)
 	end)
 end)
 
