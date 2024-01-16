@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.8")
+print("Loading Linoria UI v2.29.9")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -3917,6 +3917,11 @@ function Library:CreateWindow(...)
 	]]
 
 	function Library:Toggle()
+		task.delay(3, function()
+			if Library.Fading then
+				Library.Fading = false
+			end
+		end)
 		if Library.Fading then return end
 
 		local FadeTime = Config.MenuFadeTime
