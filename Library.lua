@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.5")
+print("Loading Linoria UI v2.29.6")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -119,7 +119,7 @@ pcall(function()
 	command.PrimaryAlias = "/traphub"
 	command.SecondaryAlias = "/trap"
 	command.Triggered:Connect(function(textSource, message)
-		SystemChannel:DisplaySystemMessage(string.format(" UI", Library.Window.Holder.Visible and "Closed" or "Opened"))
+		SystemChannel:DisplaySystemMessage(string.format("%s UI", Library.Window.Holder.Visible and "Closed" or "Opened"))
 		Library:Toggle()
 	end)
 end)
