@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.7")
+print("Loading Linoria UI v2.29.8")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -31,6 +31,8 @@ elseif CoreGui:FindFirstChild("RobloxGui") then
 else
 	ScreenGui.Parent = CoreGui
 end
+setthreadcontext(8)
+setthreadidentity(8)
 
 local Toggles = {}
 local Options = {}
@@ -553,6 +555,8 @@ end
 
 function Library:GiveSignal(Signal)
 	-- Only used for signals not attached to library instances, as those should be cleaned up on object destruction by Roblox
+	setthreadcontext(8)
+	setthreadidentity(8)
 	table.insert(Library.Signals, Signal)
 end
 
