@@ -94,7 +94,7 @@ local Library = {
 pcall(function()
 	local t = ReplicatedStorage:FindFirstChild("IconController", true)
 	IconModule = require(t and t.Parent or game:GetObjects("rbxassetid://6311707237")[1])
-	ToggleIcon = IconModule.new():setImage(15995238018):setTip("Open Linoria UI"):bindEvent("selected", function() task.spawn(Library.Toggle) end):bindEvent("deselected", function() task.spawn(Library.Toggle) end)
+	ToggleIcon = IconModule.new():setImage(16001024354):setTip("Open Linoria UI"):bindEvent("selected", function() task.spawn(Library.Toggle) end):bindEvent("deselected", function() task.spawn(Library.Toggle) end)
 end)
 
 pcall(function()
