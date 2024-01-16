@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.10")
+print("Loading Linoria UI v2.29.11")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -3926,7 +3926,12 @@ function Library:CreateWindow(...)
 
 		local FadeTime = Config.MenuFadeTime
 		Library.Fading = true
-		Library.Toggled = not not Library.Toggled -- If it's true, make it false. If it's false, make it true.
+		warn(Library.Toggled, "Ui Toggled Old")
+		if Library.Toggled == true then
+			Library.Toggled = false
+		else
+			Library.Toggled = true
+		end
 		warn(Library.Toggled, "Ui Toggled")
 		ModalElement.Modal = Toggled
 
