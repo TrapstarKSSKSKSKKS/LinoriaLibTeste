@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.6")
+print("Loading Linoria UI v2.29.7")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -3874,8 +3874,8 @@ function Library:CreateWindow(...)
 	})
 
 	local TransparencyCache = {}
-	local Toggled = false
-	local Fading = false
+	Library.Toggled = false
+	Library.Fading = false
 	local Cursor, CursorOutline
 
 	--[[
@@ -3891,7 +3891,7 @@ function Library:CreateWindow(...)
 		Library:AddToRegistry(Cursor, { Color = "AccentColor" })
 
 		local function UpdateCursor()
-			local Visi = Toggled and Library.CustomCursor
+			local Visi =  Library.Toggled and Library.CustomCursor
 			Cursor.Visible, CursorOutline.Visible = Visi, Visi
 			InputService.MouseIconEnabled = Visi == false
 
@@ -3913,14 +3913,15 @@ function Library:CreateWindow(...)
 	]]
 
 	function Library:Toggle()
-		if Fading then return end
+		if Library.Fading then return end
 
 		local FadeTime = Config.MenuFadeTime
-		Fading = true
-		Toggled = not Toggled
+		Library.Fading = true
+		Library.Toggled = not Toggled
+		warn(Library.Toggled, "Ui Toggled")
 		ModalElement.Modal = Toggled
 
-		if Toggled then
+		if Library.Toggled then
 			-- A bit scuffed, but if we're going from not toggled -> toggled we want to show the frame immediately so that the fade is visible.
 			-- if InputService.TouchEnabled and not InputService.KeyboardEnabled and not InputService.MouseEnabled then Config.Size = UDim2.fromOffset(GetResizeUI()) end
 
@@ -3955,15 +3956,15 @@ function Library:CreateWindow(...)
 
 					if Cache[Prop] == 1 then continue end
 
-					TweenService:Create(Desc, TweenInfo.new(FadeTime, Enum.EasingStyle.Linear), { [Prop] = Toggled and Cache[Prop] or 1 }):Play()
+					TweenService:Create(Desc, TweenInfo.new(FadeTime, Enum.EasingStyle.Linear), { [Prop] = Library.Toggled and Cache[Prop] or 1 }):Play()
 				end
 			end
 			task.wait(FadeTime)
 		end
 
-		Outer.Visible = Toggled
+		Outer.Visible = Library.Toggled
 
-		Fading = false
+		Library.Fading = false
 	end
 
 	Library:GiveSignal(InputService.InputBegan:Connect(function(Input, Processed)
