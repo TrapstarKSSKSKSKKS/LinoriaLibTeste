@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.11")
+print("Loading Linoria UI v2.29.12")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -93,7 +93,7 @@ local Library = {
 	ThemeUpdate = nil,
 }
 
-warn(pcall(function()
+pcall(function()
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
 	local t = ReplicatedStorage:FindFirstChild("IconController", true)
 	IconModule = t and t.Parent or game:GetObjects("rbxassetid://6311707237")[1]
@@ -102,14 +102,12 @@ warn(pcall(function()
 		:setImage(16001024329)
 		:setTip("Open Linoria UI")
 		:bindEvent("selected", function()
-			print("selected!")
 			Library:Toggle()
 		end)
 		:bindEvent("deselected", function()
-			print("deselected!")
 			Library:Toggle()
 		end)
-end))
+end)
 
 pcall(function()
 	local TextChatService = game:GetService("TextChatService")
@@ -3926,13 +3924,11 @@ function Library:CreateWindow(...)
 
 		local FadeTime = Config.MenuFadeTime
 		Library.Fading = true
-		warn(Library.Toggled, "Ui Toggled Old")
 		if Library.Toggled == true then
 			Library.Toggled = false
 		else
 			Library.Toggled = true
 		end
-		warn(Library.Toggled, "Ui Toggled")
 		ModalElement.Modal = Toggled
 
 		if Library.Toggled then
