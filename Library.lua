@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.4")
+print("Loading Linoria UI v2.29.5")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -91,39 +91,36 @@ local Library = {
 	ThemeUpdate = nil,
 }
 
-spawn(function()
-	pcall(function()
-		local t = ReplicatedStorage:FindFirstChild("IconController", true)
-		IconModule = require(t and t.Parent or game:GetObjects("rbxassetid://6311707237")[1])
-		ToggleIcon = IconModule.new():setImage(16001024329):setTip("Open Linoria UI")
-
-		repeat
-			wait()
-		until Library.Toggle
-
-		ToggleIcon:bindEvent("selected", function()
+warn(pcall(function()
+	local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	local t = ReplicatedStorage:FindFirstChild("IconController", true)
+	IconModule = t and t.Parent or game:GetObjects("rbxassetid://6311707237")[1]
+	Icon = require(IconModule)
+	local ToggleIcon = Icon.new()
+		:setImage(16001024329)
+		:setTip("Open Linoria UI")
+		:bindEvent("selected", function()
 			print("selected!")
-			task.spawn(function() Library:Toggle() end)
-		end):bindEvent("deselected", function()
-			print("deselected!")
-			task.spawn(function() Library:Toggle() end)
+			Library:Toggle()
 		end)
-	end)
-end)
+		:bindEvent("deselected", function()
+			print("deselected!")
+			Library:Toggle()
+		end)
+end))
 
 pcall(function()
 	local TextChatService = game:GetService("TextChatService")
 	local path = TextChatService.TextChatCommands
 	local SystemChannel = TextChatService:FindFirstChild("RBXSystem", true)
 	local command = path:FindFirstChild("traphub") or Instance.new("TextChatCommand", path)
-	command = path:WaitForChild("traphub", 10)
 	command.Name = "traphub"
 	command.Enabled = true
 	command.PrimaryAlias = "/traphub"
 	command.SecondaryAlias = "/trap"
 	command.Triggered:Connect(function(textSource, message)
 		SystemChannel:DisplaySystemMessage(string.format(" UI", Library.Window.Holder.Visible and "Closed" or "Opened"))
-		task.spawn(Library.Toggle)
+		Library:Toggle()
 	end)
 end)
 
