@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.13")
+print("Loading Linoria UI v2.29.14")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -102,9 +102,13 @@ pcall(function()
 		:setImage(16001540067)
 		:setTip("Open Linoria UI")
 		:bindEvent("selected", function()
+			setthreadcontext(8)
+			setthreadidentity(8)
 			Library:Toggle()
 		end)
 		:bindEvent("deselected", function()
+			setthreadcontext(8)
+			setthreadidentity(8)
 			Library:Toggle()
 		end)
 end)
@@ -3916,9 +3920,7 @@ function Library:CreateWindow(...)
 
 	function Library:Toggle()
 		task.delay(3, function()
-			if Library.Fading then
-				Library.Fading = false
-			end
+			if Library.Fading then Library.Fading = false end
 		end)
 		if Library.Fading then return end
 
