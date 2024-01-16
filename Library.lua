@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.12")
+print("Loading Linoria UI v2.29.13")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -99,7 +99,7 @@ pcall(function()
 	IconModule = t and t.Parent or game:GetObjects("rbxassetid://6311707237")[1]
 	Icon = require(IconModule)
 	local ToggleIcon = Icon.new()
-		:setImage(16001024329)
+		:setImage(16001540067)
 		:setTip("Open Linoria UI")
 		:bindEvent("selected", function()
 			Library:Toggle()
