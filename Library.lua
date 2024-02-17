@@ -31,8 +31,6 @@ elseif CoreGui:FindFirstChild("RobloxGui") then
 else
 	ScreenGui.Parent = CoreGui
 end
-setthreadcontext(8)
-setthreadidentity(8)
 
 local Toggles = {}
 local Options = {}
