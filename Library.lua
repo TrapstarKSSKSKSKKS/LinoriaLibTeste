@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.30.0")
+print("Loading Linoria UI v2.31.0")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -122,6 +122,8 @@ warn(pcall(function()
 end))
 ]]
 
+--[[
+-- Disabled for now (Breaks the UI)
 pcall(function()
 	local TextChatService = game:GetService("TextChatService")
 	local path = TextChatService.TextChatCommands
@@ -136,6 +138,7 @@ pcall(function()
 		Library:Toggle()
 	end)
 end)
+]]
 
 local function GetResizeUI()
 	local X, Y = 550, 600
