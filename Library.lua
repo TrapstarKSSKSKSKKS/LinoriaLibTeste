@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.16")
+print("Loading Linoria UI v2.29.17")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -558,8 +558,6 @@ end
 
 function Library:GiveSignal(Signal)
 	-- Only used for signals not attached to library instances, as those should be cleaned up on object destruction by Roblox
-	setthreadcontext(8)
-	setthreadidentity(8)
 	table.insert(Library.Signals, Signal)
 end
 
