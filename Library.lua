@@ -1,4 +1,4 @@
-print("Loading Linoria UI v2.29.17")
+print("Loading Linoria UI v2.30.0")
 
 -- violin-suzutsuki i love you !!!!!!
 
@@ -91,11 +91,18 @@ local Library = {
 	ThemeUpdate = nil,
 }
 
-pcall(function()
+--[[
+-- Disabled for nwo (Breaks the UI)
+
+warn(pcall(function()
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
 	local t = ReplicatedStorage:FindFirstChild("IconController", true)
-	IconModule = t and t.Parent or game:GetObjects("rbxassetid://6311707237")[1]
+	IconModule = t and t.Parent
+	warn(IconModule)
+	if not IconModule then return end
+	setthreadcontext(2)
 	Icon = require(IconModule)
+	setthreadcontext(8)
 	local ToggleIcon = Icon.new()
 		:setImage(16001540067)
 		:setTip("Open Linoria UI")
@@ -112,7 +119,8 @@ pcall(function()
 			end)
 		end)
 		:setImageYScale(1.5)
-end)
+end))
+]]
 
 pcall(function()
 	local TextChatService = game:GetService("TextChatService")
@@ -4007,172 +4015,149 @@ Players.PlayerRemoving:Connect(OnPlayerChange)
 
 getgenv().Library = Library
 
-if not GameName then return Library end
-
-do --// PreLoad
-	local invite = "dWFde2Bf7U"
-	local request = http_request or request or HttpPost or (syn and syn.request) or (http and http.request)
-	local LoadFromGithub
-	do
-		local function KickClient(reason) return game:GetService("Players").LocalPlayer:Kick(reason) end
-
-		local function GetUrl(url)
-			local response = request({ Url = url, Method = "GET" })
-
-			local success = response.StatusCode == 200
-			local body = response.Body
-
-			if not success then return false, "Request failed. StatusCode: " .. response.StatusCode end
-
-			return true, body
-		end
-
-		function LoadFromGithub(owner, repo, file)
-			local url = "https://raw.githubusercontent.com/" .. owner .. "/" .. repo .. "/main/" .. file
-			local success, body = GetUrl(url)
-
-			if not success then return KickClient("Failed to fetch from github. " .. table.concat({ "Url:", url, "\n", "Error:", tostring(body) })) end
-
-			local fn, err = loadstring(body)
-			if not fn then return KickClient("Failed to load from github. " .. table.concat({ "Url:", url, "\n", "Error:", tostring(err) })) end
-
-			local results = { pcall(fn) }
-			local success = table.remove(results, 1)
-
-			if not success then return KickClient("Failed to execute from github. " .. table.concat({ "Url:", url, "\n", "Error:", tostring(results[1]) })) end
-
-			return unpack(results)
-		end
+if not GameName then
+	for _, func in next, Library.OnLoads do
+		spawn(function() Library:SafeCallback(func) end)
 	end
+	Library.Loaded = true
+	return Library
+end
 
-	local ThemeManager = LoadFromGithub("TrapstarKSSKSKSKKS", "LinoriaLibTeste", "addons/ThemeManager.lua")
-	local win = Library:CreateWindow({ Title = string.format("TrapHub | %s", GameName or "Universal"), Center = true, AutoShow = false })
-	local tSettings = win:AddTab("Settings", 100)
-	local tUI = win:AddTab("UI", 101)
+--// PreLoad
+local invite = "dWFde2Bf7U"
+local request = http_request or request or HttpPost or (syn and syn.request) or (http and http.request)
 
-	ThemeManager:SetLibrary(Library)
-	ThemeManager:SetFolder("Trap Hub")
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/TrapstarKSSKSKSKKS/LinoriaLibTeste/main/addons/ThemeManager.lua"))()
+local win = Library:CreateWindow({
+	Title = string.format("TrapHub | %s", GameName or "Universal"),
+	Center = true,
+	AutoShow = false,
+})
+local tSettings = win:AddTab("Settings", 100)
+local tUI = win:AddTab("UI", 101)
 
-	Library.Tabs.Settings = tSettings
-	Library.Tabs.UI = tUI
-	Library.Win = win
+ThemeManager:SetLibrary(Library)
+ThemeManager:SetFolder("Trap Hub")
 
-	do --// Settings
-		local gMisc = tSettings:AddRightGroupbox("Misc")
-		local gWebhook = tSettings:AddLeftGroupbox("Webhooks")
+Library.Tabs.Settings = tSettings
+Library.Tabs.UI = tUI
+Library.Win = win
 
-		--// Misc
-		gMisc
-			:AddButton("Copy Invite", function()
-				if pcall(setclipboard, string.format("https://discord.gg/%s", invite)) then
-					Library:Notify("Copied discord invite!", 3)
-				else
-					Library:Notify("Failed to copy discord invite!", 3)
+do --// Settings
+	local gMisc = tSettings:AddRightGroupbox("Misc")
+	local gWebhook = tSettings:AddLeftGroupbox("Webhooks")
+
+	--// Misc
+	gMisc
+		:AddButton("Copy Invite", function()
+			if pcall(setclipboard, string.format("https://discord.gg/%s", invite)) then
+				Library:Notify("Copied discord invite!", 3)
+			else
+				Library:Notify("Failed to copy discord invite!", 3)
+			end
+		end)
+		:AddButton("Join Discord", function()
+			for i = 6463, 6472 do -- // Just cause there is a 10 range port
+				if
+					pcall(
+						function()
+							request({
+								Url = ("http://127.0.0.1:%s/rpc?v=1"):format(i),
+								Method = "POST",
+								Headers = {
+									["Content-Type"] = "application/json",
+									Origin = "https://discord.com",
+								},
+								Body = ('{"cmd":"INVITE_BROWSER","args":{"code":"%s"},"nonce":"%s"}'):format(code, string.lower(HttpService:GenerateGUID(false))),
+							})
+						end
+					)
+				then
+					break
 				end
-			end)
-			:AddButton("Join Discord", function()
-				for i = 6463, 6472 do -- // Just cause there is a 10 range port
-					if
-						pcall(
-							function()
-								request({
-									Url = ("http://127.0.0.1:%s/rpc?v=1"):format(i),
-									Method = "POST",
-									Headers = {
-										["Content-Type"] = "application/json",
-										Origin = "https://discord.com",
-									},
-									Body = ('{"cmd":"INVITE_BROWSER","args":{"code":"%s"},"nonce":"%s"}'):format(code, string.lower(HttpService:GenerateGUID(false))),
-								})
-							end
-						)
-					then
-						break
-					end
-				end
-			end)
+			end
+		end)
 
-		gMisc:AddLabel(string.format("https://discord.gg/%s", invite))
+	gMisc:AddLabel(string.format("https://discord.gg/%s", invite))
 
-		gMisc:AddToggle("DiscordNotif", {
-			Text = "Discord Notification",
+	gMisc:AddToggle("DiscordNotif", {
+		Text = "Discord Notification",
+		Default = true,
+	})
+
+	--// Webhook
+
+	gWebhook:AddInput("WebhookUrl", {
+		Default = "",
+		Numeric = false,
+		Finished = false,
+		Text = "Webhook Url",
+		Placeholder = "Webhook Url",
+	})
+
+	gWebhook:AddLabel("Embed Color:"):AddColorPicker("ColorWebhook", {
+		Default = Color3.fromRGB(0, 0, 0),
+	})
+
+	gWebhook:AddInput("WebhookIdPing", {
+		Default = "",
+		Numeric = true,
+		Finished = false,
+		Text = "Discord Id",
+		Placeholder = "Discord Id To Ping",
+	})
+
+	gWebhook:AddToggle("pingdiscord", {
+		Text = "Ping Discord",
+		Default = false,
+	})
+end
+
+do --// UI
+	local gThemes = tUI:AddRightGroupbox("Themes")
+	local gMisc = tUI:AddLeftGroupbox("Misc")
+	ThemeManager:ApplyToGroupbox(gThemes)
+	gMisc:AddButton("Unload", function() Library:Unload() end)
+	gMisc:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", { Default = "Delete", NoUI = true, Text = "Menu keybind" })
+	Library.ToggleKeybind = Options.MenuKeybind
+
+	gMisc:AddToggle("BlackScreen", {
+		Text = "Black Screen",
+		Default = true,
+	})
+
+	gMisc:AddToggle("CustomCursor", {
+		Text = "Custom Cursor",
+		Default = false,
+		Callback = function(t)
+			if Drawing then
+				Library.CustomCursor = t
+			elseif t then
+				Library:Notify("Drawing is not supported on your exploit!", 3)
+				Toggles.CustomCursor:SerValue(false)
+			end
+		end,
+	})
+
+	gMisc:AddToggle("ShowWatermark", {
+		Text = "Show Watermark",
+		Default = false,
+		Callback = function(t) Library:SetWatermarkVisibility(t) end,
+	})
+
+	gMisc
+		:AddToggle("ShowKeybindsMenu", {
+			Text = "Show Keybinds Menu",
+			Default = false,
+		})
+		:OnChanged(function(t) Library.KeybindFrame.Visible = t end)
+
+	gMisc
+		:AddToggle("ShowNotifications", {
+			Text = "Show Notifications",
 			Default = true,
 		})
-
-		--// Webhook
-
-		gWebhook:AddInput("WebhookUrl", {
-			Default = "",
-			Numeric = false,
-			Finished = false,
-			Text = "Webhook Url",
-			Placeholder = "Webhook Url",
-		})
-
-		gWebhook:AddLabel("Embed Color:"):AddColorPicker("ColorWebhook", {
-			Default = Color3.fromRGB(0, 0, 0),
-		})
-
-		gWebhook:AddInput("WebhookIdPing", {
-			Default = "",
-			Numeric = true,
-			Finished = false,
-			Text = "Discord Id",
-			Placeholder = "Discord Id To Ping",
-		})
-
-		gWebhook:AddToggle("pingdiscord", {
-			Text = "Ping Discord",
-			Default = false,
-		})
-	end
-
-	do --// UI
-		local gThemes = tUI:AddRightGroupbox("Themes")
-		local gMisc = tUI:AddLeftGroupbox("Misc")
-		ThemeManager:ApplyToGroupbox(gThemes)
-		gMisc:AddButton("Unload", function() Library:Unload() end)
-		gMisc:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", { Default = "Delete", NoUI = true, Text = "Menu keybind" })
-		Library.ToggleKeybind = Options.MenuKeybind
-
-		gMisc:AddToggle("BlackScreen", {
-			Text = "Black Screen",
-			Default = true,
-		})
-
-		gMisc:AddToggle("CustomCursor", {
-			Text = "Custom Cursor",
-			Default = false,
-			Callback = function(t)
-				if Drawing then
-					Library.CustomCursor = t
-				elseif t then
-					Library:Notify("Drawing is not supported on your exploit!", 3)
-					Toggles.CustomCursor:SerValue(false)
-				end
-			end,
-		})
-
-		gMisc:AddToggle("ShowWatermark", {
-			Text = "Show Watermark",
-			Default = false,
-			Callback = function(t) Library:SetWatermarkVisibility(t) end,
-		})
-
-		gMisc
-			:AddToggle("ShowKeybindsMenu", {
-				Text = "Show Keybinds Menu",
-				Default = false,
-			})
-			:OnChanged(function(t) Library.KeybindFrame.Visible = t end)
-
-		gMisc
-			:AddToggle("ShowNotifications", {
-				Text = "Show Notifications",
-				Default = true,
-			})
-			:OnChanged(function(t) Library.NotificationArea.Visible = t end)
-	end
+		:OnChanged(function(t) Library.NotificationArea.Visible = t end)
 end
 
 for _, func in next, Library.OnLoads do
